@@ -7,7 +7,7 @@ using PetaPoco;
 
 namespace PengarMaskin.Models.Dal
 {
-    class DAL
+    class DAL 
     {
         public Trend GetTrend(Database db,int Aktie_ID) {
             var dt = DateTime.Now;
