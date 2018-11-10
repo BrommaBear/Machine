@@ -25,7 +25,9 @@ namespace PengarMaskin.Models.Dal
            .Append(",Min15   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-15,@1))", Aktie_ID, dt)
            .Append(",Min10   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-10,@1))", Aktie_ID, dt)
            .Append(",Min05   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-05,@1))", Aktie_ID, dt)
+           .Append(",Min03   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-02,@1))", Aktie_ID, dt)
            .Append(",Min02   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-02,@1))", Aktie_ID, dt)
+           .Append(",Min01   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-01,@1))", Aktie_ID, dt)
            
            ;
 
@@ -45,6 +47,25 @@ namespace PengarMaskin.Models.Dal
             public decimal Change { get; set; }
             public decimal Procent { get; set; }
             public DateTime DateTime{ get; set; }
+        }
+
+        [TableName("AktieUtv")]
+        [PrimaryKey("Id")]
+        public class AktieUtv
+        {
+            public int Id { get; set; }
+            public int Aktie_ID { get; set; }
+            public string Namn { get; set; }
+            public decimal Idag { get; set; }
+            public decimal EnVecka { get; set; }
+            public decimal EnMan { get; set; }
+            public decimal TreMan { get; set; }
+            public decimal SexMan { get; set; }
+            public decimal EttAr { get; set; }
+            public decimal TvaAr { get; set; }
+            public decimal TreAr { get; set; }
+            public decimal FemAr { get; set; }      
+            public DateTime DateTime { get; set; }
         }
 
         [TableName("Buy")]
@@ -133,7 +154,9 @@ namespace PengarMaskin.Models.Dal
             public decimal Min15 { get; set; }
             public decimal Min10 { get; set; }
             public decimal Min05 { get; set; }
+            public decimal Min03 { get; set; }
             public decimal Min02 { get; set; }
+            public decimal Min01 { get; set; }
         
         }
 
