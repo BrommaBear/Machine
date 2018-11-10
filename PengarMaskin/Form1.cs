@@ -165,13 +165,7 @@ namespace PengarMaskin
                         Message.Log(MessageType.Error, ex.Message);
                     }
                 }
-                //ind++;
-
-
-                //if (ind > 29)
-                //{
-                //    // break;
-                //}
+          
             } 
               
         } 
