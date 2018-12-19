@@ -24,9 +24,9 @@ namespace PengarMaskin.Models.Dal
            .Append(",Min20   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-20,@1))", Aktie_ID, dt)
            .Append(",Min15   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-15,@1))", Aktie_ID, dt)
            .Append(",Min10   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-10,@1))", Aktie_ID, dt)
+           .Append(",Min07   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-07,@1))", Aktie_ID, dt)
            .Append(",Min05   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-05,@1))", Aktie_ID, dt)
-           .Append(",Min03   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-02,@1))", Aktie_ID, dt)
-           .Append(",Min02   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-02,@1))", Aktie_ID, dt)
+           .Append(",Min03   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-03,@1))", Aktie_ID, dt)
            .Append(",Min01   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-01,@1))", Aktie_ID, dt)
            
            ;
@@ -153,9 +153,9 @@ namespace PengarMaskin.Models.Dal
             public decimal Min20 { get; set; }
             public decimal Min15 { get; set; }
             public decimal Min10 { get; set; }
+            public decimal Min07 { get; set; }
             public decimal Min05 { get; set; }
             public decimal Min03 { get; set; }
-            public decimal Min02 { get; set; }
             public decimal Min01 { get; set; }
         
         }
