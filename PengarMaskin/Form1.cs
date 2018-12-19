@@ -390,7 +390,7 @@ namespace PengarMaskin
                             {
                                 Aktie_ID = Convert.ToInt32(rowid.Substring(5)),
                                 Namn = cells[1].Text,
-                                Idag = cells[2].Text.Remove(cells[2].Text.Length - 1, 1).Par
+                                Idag = Convert.ToDecimal(cells[2].Text.Remove(cells[2].Text.Length - 1, 1)),
                                 EnVecka = Convert.ToDecimal(cells[3].Text.Remove(cells[3].Text.Length - 1, 1)),
                                 EnMan = Convert.ToDecimal(cells[4].Text.Remove(cells[4].Text.Length - 1, 1)),
                                 TreMan = Convert.ToDecimal(cells[5].Text.Remove(cells[5].Text.Length - 1, 1)),
