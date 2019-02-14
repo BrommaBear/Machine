@@ -217,7 +217,7 @@ namespace PengarMaskin
             var pricelast = _driver.FindElement(By.Id("price-last"));
             var bid = _driver.FindElement(By.XPath("//*[@id='price-bid']"));
             var ask = _driver.FindElement(By.XPath("//*[@id='price-ask']"));
-            Message.Log(MessageType.Info, string.Format("Bid = {0} Bid = {1} stockPrice = {2}", bid.Text,ask.Text, pricelast.Text));
+            Message.Log(MessageType.Info, string.Format("Bid = {0} Ask = {1} stockPrice = {2}", bid.Text,ask.Text, pricelast.Text));
             
             var BuyButton = _driver.FindElement(By.Id("stockBuyButton"));
             BuyButton.Click();
@@ -455,8 +455,8 @@ namespace PengarMaskin
             _borstrend.DateTime = dt;
             db.Insert("BorsTrend", "Id", _borstrend);
 
-            //_driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&large=on&mid=on&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=1_1&large=on&mid=on&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
+            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&large=on&mid=on&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
+           // _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=1_1&large=on&mid=on&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
 
             //Find the Search text box UI Element
             IWebElement table = _driver.FindElement(By.XPath("//table[@id='kurstabell']"));
@@ -519,7 +519,7 @@ namespace PengarMaskin
                                 CheckHigh(_db, _Aktie);
 
                                 if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 05, 00)
-                                 & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 05, 00))
+                                 & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 00, 00))
                                 {
                                     var buy = CheckBuy(_db, _Aktie, ind);
                                     if (buy)
@@ -552,6 +552,7 @@ namespace PengarMaskin
 
                                 foreach (var BuyAkt in AktierListBuy)
                                 {
+                                    //Message.Log(MessageType.Info, string.Format("CheckSell av {0}", BuyAkt.Namn));
                                     var xSell = CheckSell(_db, BuyAkt);
                                     if (xSell)
                                     {
@@ -616,31 +617,42 @@ namespace PengarMaskin
         {
             var retu = false;
             var _AktieLow = AktierListLow.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
-           
-            if (((_Aktie.Pris / _AktieLow.Pris) > Convert.ToDecimal(1.003))  
-            & (_Aktie.Procent > Convert.ToDecimal(1.0))
-            & (_Aktie.Procent < Convert.ToDecimal(4.0))
-            & (_Aktie.Omsatt > 100000)
-            & (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 10, 00))
-            & (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 11, 00, 00))
-            & _Aktie.Aktie_ID != 4870) //Fingerprint))
+            var _AKtieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
+            var _AktieHigh = AktierListHigh.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
+            if (_AKtieBuy == null)
             {
-                var _AKtieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
-                if (_AKtieBuy == null) 
+           
+                if ((((_Aktie.Pris / _AktieLow.Pris) > Convert.ToDecimal(1.003))  
+                & (_Aktie.Procent > Convert.ToDecimal(1.0))
+                //& (_Aktie.Procent < Convert.ToDecimal(4.0))
+                & (_Aktie.Omsatt > 100000)
+                & (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 10, 00))
+                & (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 00))
+                & _Aktie.Aktie_ID != 4870 //Fingerprint))
+                & _Aktie.Namn.TrimEnd().Substring(_Aktie.Namn.Length - 1,1) != "A")
+                //|| (ind <=5
+                //    & _Aktie.Namn.TrimEnd().Substring(_Aktie.Namn.Length - 1,1) != "A"
+                //    & (_Aktie.Omsatt > 100000))
+                    )                   
                 {
+                
                     var x = new DAL();
-                    DAL.Trend _trend =  x.GetTrend(db, _Aktie.Aktie_ID); 
+                    DAL.Trend _trend =  x.GetTrend(db, _Aktie.Aktie_ID);
 
-                    if (_trend.Min20 <= _trend.Min10
+                    if (((_AktieHigh.Pris / _Aktie.Pris) > Convert.ToDecimal(1.003) 
                         & _trend.Min10 < _trend.Min07
                         & _trend.Min07 < _trend.Min05
                         & _trend.Min05 < _trend.Min03
                         & _trend.Min03 < _trend.Min01 
                         & _trend.Min01 < _Aktie.Pris 
+                        & (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 00))
                         & _trend.TrendNU > Convert.ToDecimal(-0.3))
+                     //|| (ind <= 5
+                     //   & _trend.TrendNU > Convert.ToDecimal(0.0))
+                     //   & (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 05, 00))
+                        )
                     { 
-                        var _AKtieHigh = AktierListHigh.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
-                        
+                                                
                         int MaxAntalKop = int.Parse(ConfigurationManager.AppSettings["MaxAntalKop"]);
                         if (AntalAffarer < MaxAntalKop)
                         {
@@ -648,28 +660,28 @@ namespace PengarMaskin
                             AktierListBuy.Add(_Aktie);
                             db.Insert("Buy", "Id", _Aktie);
                             AntalAffarer++;
-                            
-                            var sText = (string.Format("Köper = {0} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12}"
+
+                            var sText = (string.Format("Köper = {0} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13}"
                                                 , _Aktie.Namn.ToString(), _Aktie.Pris.ToString(), _AktieLow.Pris.ToString()
                                                 , _trend.Min20.ToString().ToString(), _trend.Min15.ToString(), _trend.Min05.ToString()
                                                 , _trend.Min01.ToString(), _trend.Trend20.ToString(), _trend.Trend15.ToString()
                                                 , _trend.Trend10.ToString(), _trend.Trend05.ToString(), _trend.TrendNU.ToString()
-                                                ,ind));
+                                                , ind, (_AktieHigh.Pris / _Aktie.Pris)));
                             Message.Log(MessageType.Info, sText);
-                            _AKtieHigh.Pris = _Aktie.Pris;
+                            _AktieHigh.Pris = _Aktie.Pris;
                             _AktieLow.Pris = _Aktie.Pris;
                             retu = true;
                         }
                         else
                         {
-                            if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 00, 00))
+                            if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 00))
                             {
-                                var sText = (string.Format("Skulle köpt = {0} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12}"
+                                var sText = (string.Format("Skulle köpt = {0} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13}"
                                                 , _Aktie.Namn.ToString(), _Aktie.Pris.ToString(), _AktieLow.Pris.ToString()
                                                 , _trend.Min20.ToString().ToString(), _trend.Min15.ToString(), _trend.Min05.ToString()
                                                 , _trend.Min01.ToString(), _trend.Trend20.ToString(), _trend.Trend15.ToString()
                                                 , _trend.Trend10.ToString(), _trend.Trend05.ToString(), _trend.TrendNU.ToString()
-                                                ,ind));
+                                                ,ind,(_AktieHigh.Pris / _Aktie.Pris)));
                             Message.Log(MessageType.Info, sText);
                         }
                         }
@@ -699,44 +711,41 @@ namespace PengarMaskin
                     //if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 11, 00, 00))
                     //{
                     overbuy = Convert.ToDecimal(1.03);
-                    underMax = Convert.ToDecimal(1.01);
+                    underMax = Convert.ToDecimal(1.04);
                     if (_Aktie.Aktie_ID == 4870) //Fingerprint
                     {
-                        underMax = Convert.ToDecimal(1.002);
+                        underMax = Convert.ToDecimal(1.003);
                     }
-                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 10, 30, 00))
+                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 10, 00))
+                    {
+                        overbuy = Convert.ToDecimal(1.03);
+                    }
+                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 15, 00))
+                    {
+                        overbuy = Convert.ToDecimal(1.03);
+                    }
+                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 00))
                     {
                         overbuy = Convert.ToDecimal(1.02);
                     }
-                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 00, 00))
-                    {
-                        overbuy = Convert.ToDecimal(1.015);
-                    }
-                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 00, 00))
+                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 14, 30, 00))
                     {
                         overbuy = Convert.ToDecimal(1.01);
-                    }
-                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 14, 00, 00))
-                    {
-                        overbuy = Convert.ToDecimal(1.008);
+                        underMax = Convert.ToDecimal(1.02);
                     }
                     if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 15, 00, 00))
                     {
-                        overbuy = Convert.ToDecimal(1.006);
-                    }
-                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 15, 30, 00))
-                    {
-                        overbuy = Convert.ToDecimal(1.004);
+                        overbuy = Convert.ToDecimal(1.01);
                     }
                     if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 00))
                     {
-                        overbuy = Convert.ToDecimal(1.002);
-                    }
-                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 15, 00))
-                    {
-                        overbuy = Convert.ToDecimal(1.001);
+                        overbuy = Convert.ToDecimal(1.005);
                     }
                     if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 30, 00))
+                    {
+                        overbuy = Convert.ToDecimal(1.003);
+                    }
+                    if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 00, 00))
                     {
                         overbuy = Convert.ToDecimal(1.000);
                     }
