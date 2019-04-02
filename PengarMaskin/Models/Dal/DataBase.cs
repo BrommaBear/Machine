@@ -11,6 +11,13 @@ namespace PengarMaskin.Models.Dal
     {
         public Trend GetTrend(Database db,int Aktie_ID) {
             var dt = DateTime.Now;
+            var today = DateTime.Today;
+            var DagFore = today.AddDays(-1);
+            if (DateTime.Today.DayOfWeek == DayOfWeek.Monday)
+            {
+                 DagFore = today.AddDays(-3);
+            }
+          
             //dt = DateTime.Now.AddHours(-6);
             var sql = new PetaPoco.Sql()
            .Append("Select ")
@@ -28,6 +35,7 @@ namespace PengarMaskin.Models.Dal
            .Append(",Min05   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-05,@1))", Aktie_ID, dt)
            .Append(",Min03   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-03,@1))", Aktie_ID, dt)
            .Append(",Min01   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-01,@1))", Aktie_ID, dt)
+           .Append(",MinDagFore = (select min(pris) from history where aktie_id = @0 and DateTime > @1 and DateTime < @2)", Aktie_ID, DagFore,DagFore.AddDays(+1))
            
            ;
 
@@ -157,7 +165,7 @@ namespace PengarMaskin.Models.Dal
             public decimal Min05 { get; set; }
             public decimal Min03 { get; set; }
             public decimal Min01 { get; set; }
-        
+            public decimal MinDagFore { get; set; }          
         }
 
 
