@@ -9,6 +9,11 @@ namespace PengarMaskin.Models.Dal
 {
     class DAL 
     {
+        Database _db;
+        public DAL()
+        {
+            _db = new Database("Bjorn");
+        }
         public Trend GetTrend(Database db,int Aktie_ID) {
             var dt = DateTime.Now;
             var today = DateTime.Today;
@@ -41,7 +46,23 @@ namespace PengarMaskin.Models.Dal
 
             List<Trend> ret =  db.Query<Trend>(sql).ToList();
             return ret[0];
-        } 
+        }
+
+        public AktieID GetAktieID(string Name)
+        {
+            var sql = new PetaPoco.Sql()
+            .Append("SELECT Aktie_ID ")
+            .Append(",Namn ")
+            .Append("FROM Aktie ")
+            .Append("Where Namn = @0", Name);
+                    
+            List <AktieID> ret = _db.Query<AktieID>(sql).ToList();
+            return ret[0];
+        }
+
+
+
+
 
 
         [TableName("History")]
@@ -75,6 +96,17 @@ namespace PengarMaskin.Models.Dal
             public decimal FemAr { get; set; }      
             public DateTime DateTime { get; set; }
         }
+
+        [TableName("Aktie")]
+        [PrimaryKey("Id")]
+        public class AktieID
+        {
+            public int Id { get; set; }
+            public int Aktie_ID { get; set; }
+            public string Namn { get; set; }
+            
+        }
+
 
         [TableName("Buy")]
         [PrimaryKey("Id")]
