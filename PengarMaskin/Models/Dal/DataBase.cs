@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PetaPoco; 
 
-namespace PengarMaskin.Models.Dal
+namespace PengarMaskin
 {
     class DAL 
     {
