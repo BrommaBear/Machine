@@ -5,17 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using System.Configuration;
 
 
 namespace PengarMaskin
 {
     class Init
     {
-        public static void Initialize(IWebDriver _driver)
+        public static void Initialize(ref IWebDriver _driver)
         {
             try
             {
-                InitChrome(_driver);
+                InitChrome(ref _driver);
                 Logon(_driver);
 
             }
@@ -43,7 +44,7 @@ namespace PengarMaskin
                 }
             }
         }
-        public static void InitChrome(IWebDriver _driver)
+        public static void InitChrome(ref IWebDriver _driver)
         {
 
             Message.Log(MessageType.Info, "InitChrome");
@@ -62,7 +63,7 @@ namespace PengarMaskin
             _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/login/start.html?cmpi=start-loggain&state=signin");
             System.Threading.Thread.Sleep(1 * 1000);
 
-            var loginSidaButton = _driver.FindElement(By.XPath("//section/section[2]/section/section/section[4]/div[2]/div/button"));
+            var loginSidaButton = _driver.FindElement(By.XPath("//section/section[2]/section/section/section/div[2]/div/button"));
 
             loginSidaButton.Click();
 
@@ -73,8 +74,9 @@ namespace PengarMaskin
             userNameField.SendKeys("brommabjorn");
             userPasswordField.SendKeys("Lk(5SMZg");
             
-            var loginButton = _driver.FindElement(By.XPath("//*[@id='authentication-login']/section/section[2]/section/section/section[4]/section/section/section/form/section[3]/div[1]/button"));
-            
+            var loginButton = _driver.FindElement(By.XPath("//*[@id='authentication-login']/section/section[2]/section/section/section/section/section/section/form/section[2]/div[1]/button"));
+            //*[@id="authentication-login"]/section/section[2]/section/section/section/section/section/section/form/section[2]/div[1]/button
+
             loginButton.Click();
             System.Threading.Thread.Sleep(2 * 1000);
 

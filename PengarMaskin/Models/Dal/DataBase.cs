@@ -9,7 +9,7 @@ namespace PengarMaskin
 {
     class DAL 
     {
-        Database _db;
+        readonly Database _db ;
         public DAL()
         {
             _db = new Database("Bjorn");

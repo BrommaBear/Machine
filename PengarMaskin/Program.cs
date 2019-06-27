@@ -8,33 +8,29 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 
+
 namespace PengarMaskin
 {
-    static class Program
+    class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        
-        [STAThread]
         static void Main()
         {
-            //Application.EnableVisualStyles();
-           // Application.SetCompatibleTextRenderingDefault(false);
-           
-            Console.WriteLine("Press the Enter key to exit the program at any time... ");
-            Console.ReadLine();
+            PengarMaskin pm  = new PengarMaskin();
+            var x = 1;
+            while (x == 1)
+            {
+                try
+                {
+                    pm.Run();
+                }
+                catch (WebDriverException ex)
+                {
+                    Message.Log(MessageType.Info, "Error i ListRefresh");
+                    Message.Log(MessageType.Info, ex.Message);
+                    Message.Log(MessageType.Error, "Hit ska vi aldrig komma");
+                }
+            }
 
-            Application.Run(new Form1());
-           
         }
-        
-       
-
-
-
     }
-
-    
-    
 }
