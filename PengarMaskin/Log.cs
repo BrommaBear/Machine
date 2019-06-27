@@ -13,11 +13,13 @@ namespace PengarMaskin
         {
             using (var db = new Database("Bjorn"))
             {
-                var msg = new DAL.Message();
-                msg.DateTime = DateTime.Now;
-                msg.Program = "PengarMaskin";
-                msg.Severity = s.ToString();
-                msg.Text = text;
+                var msg = new DAL.Message()
+                {
+                 DateTime = DateTime.Now 
+                ,Program = "PengarMaskin" 
+                ,Severity = s.ToString() 
+                ,Text = text 
+                };
                 db.Insert("Message", "Id", msg);
             }
 
