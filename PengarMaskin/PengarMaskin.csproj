@@ -104,6 +104,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Subs\Buy.cs" />
     <Compile Include="Subs\Check.cs" />
+    <Compile Include="Subs\CheckBlankning.cs" />
     <Compile Include="Subs\Init.cs" />
     <Compile Include="Subs\Portfolio.cs" />
     <Compile Include="Subs\Sell.cs" />
