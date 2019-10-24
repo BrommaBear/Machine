@@ -61,7 +61,7 @@ namespace PengarMaskin
                             db.Insert("Buy", "Id", _Aktie);
                             AntalAffarer++;
 
-                            var sText = (string.Format("Köper = {0} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13}"
+                            var sText = (string.Format("Köper = {0} pris = {1} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6}  trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13}"
                                                 , _Aktie.Namn.ToString(), _Aktie.Pris.ToString(), _AktieLow.Pris.ToString()
                                                 , _trend.Min20.ToString().ToString(), _trend.Min15.ToString(), _trend.Min05.ToString()
                                                 , _trend.Min01.ToString(), _trend.Trend20.ToString(), _trend.Trend15.ToString()
@@ -78,6 +78,46 @@ namespace PengarMaskin
                         else
                         {
                             var sText = string.Format("Skulle köpt {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString());
+                            Message.Log(MessageType.Info, sText);
+
+                        }
+                    }
+                    if (
+                        (_Aktie.Pris < _trend.Min15)
+                       & (_Aktie.Pris < _trend.Min10)
+                       & (_Aktie.Pris < _trend.Min05)
+                       & (_trend.Min05 < _trend.Min15)
+                       & (_Aktie.Procent > Convert.ToDecimal(1.0))
+                       & (_Aktie.Procent < Convert.ToDecimal(2.0))
+                       & (_trend.TrendNU > Convert.ToDecimal(0.2))
+                       & (_Aktie.Pris > _AktieLow.Pris)
+                        )
+                    {
+                        if (AntalAffarer < MaxAntalKop)
+                        {
+                            Message.Log(MessageType.Info, string.Format("Över 1,4 Köper {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString()));
+                            Buy.Buyer(_driver, _Aktie);
+                            AktierListBuy.Add(_Aktie);
+                            db.Insert("Buy", "Id", _Aktie);
+                            AntalAffarer++;
+
+                            var sText = (string.Format("Köper =  {0} pris = {1} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6}  trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13}"
+                                                , _Aktie.Namn.ToString(), _Aktie.Pris.ToString(), _AktieLow.Pris.ToString()
+                                                , _trend.Min20.ToString().ToString(), _trend.Min15.ToString(), _trend.Min05.ToString()
+                                                , _trend.Min01.ToString(), _trend.Trend20.ToString(), _trend.Trend15.ToString()
+                                                , _trend.Trend10.ToString(), _trend.Trend05.ToString(), _trend.TrendNU.ToString()
+                                                , ind, (_AktieHigh.Pris / _Aktie.Pris)));
+                            Message.Log(MessageType.Info, sText);
+                            _AktieHigh.Pris = _Aktie.Pris;
+                            _AktieLow.Pris = _Aktie.Pris;
+
+                            var newprice = (_Aktie.Pris * Convert.ToDecimal(1.013));
+
+                            retu = true;
+                        }
+                        else
+                        {
+                            var sText = string.Format("Skulle köpt över 1,4 {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString());
                             Message.Log(MessageType.Info, sText);
 
                         }
