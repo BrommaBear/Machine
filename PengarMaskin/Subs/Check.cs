@@ -14,9 +14,9 @@ namespace PengarMaskin
         public static Boolean Buyer(IWebDriver _driver
                                      , Database db
                                      , Aktie _Aktie, int ind
-                                     , int AntalAffarer
+                                     , ref int AntalAffarer
                                      , List<Aktie> AktierListHigh
-                                     , List<Aktie> AktierListBuy
+                                     , ref List<Aktie> AktierListBuy
                                      , List<Aktie> AktierListLow)
         {
             var retu = false;
@@ -87,6 +87,7 @@ namespace PengarMaskin
                        & (_Aktie.Pris < _trend.Min10)
                        & (_Aktie.Pris < _trend.Min05)
                        & (_trend.Min05 < _trend.Min15)
+                       & (_trend.Min05 < _trend.Min20)
                        & (_Aktie.Procent > Convert.ToDecimal(1.0))
                        & (_Aktie.Procent < Convert.ToDecimal(2.0))
                        & (_trend.TrendNU > Convert.ToDecimal(0.2))
@@ -101,12 +102,12 @@ namespace PengarMaskin
                             db.Insert("Buy", "Id", _Aktie);
                             AntalAffarer++;
 
-                            var sText = (string.Format("Köper =  {0} pris = {1} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6}  trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13}"
+                            var sText = (string.Format("Köper =  {0} pris = {1} pris_min = {2} pris_max = {12} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6}  trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11} listnr = {12} Under_high = {13} AntalAffärer = {14} MaxAntalAffärer = {15}"
                                                 , _Aktie.Namn.ToString(), _Aktie.Pris.ToString(), _AktieLow.Pris.ToString()
                                                 , _trend.Min20.ToString().ToString(), _trend.Min15.ToString(), _trend.Min05.ToString()
                                                 , _trend.Min01.ToString(), _trend.Trend20.ToString(), _trend.Trend15.ToString()
                                                 , _trend.Trend10.ToString(), _trend.Trend05.ToString(), _trend.TrendNU.ToString()
-                                                , ind, (_AktieHigh.Pris / _Aktie.Pris)));
+                                                , ind, (_AktieHigh.Pris / _Aktie.Pris), AntalAffarer, MaxAntalKop));
                             Message.Log(MessageType.Info, sText);
                             _AktieHigh.Pris = _Aktie.Pris;
                             _AktieLow.Pris = _Aktie.Pris;
@@ -117,9 +118,10 @@ namespace PengarMaskin
                         }
                         else
                         {
-                            var sText = string.Format("Skulle köpt över 1,4 {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString());
+                            var sText = string.Format("Skulle köpt mllan 1,0 och 2,0 {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4} AntalAffärer = {5} MaxAntalAffärer = {6}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString(), AntalAffarer, MaxAntalKop);
                             Message.Log(MessageType.Info, sText);
-
+                            
+                        
                         }
                     }
 
@@ -131,10 +133,10 @@ namespace PengarMaskin
          public static Boolean Seller(IWebDriver _driver
                                      , Database db
                                      , Aktie _Aktie
-                                     , int AntalAffarer
+                                     , ref int AntalAffarer
                                      , List<Aktie> AktierListHigh
-                                     , List<Aktie> AktierListBuy
-                                     , List<Aktie> AktierListSell
+                                     , ref List<Aktie> AktierListBuy
+                                     , ref List<Aktie> AktierListSell
                                      , List<Aktie> AktierListLow)
          {
             var retu = false;

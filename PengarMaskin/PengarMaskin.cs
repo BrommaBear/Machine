@@ -264,7 +264,7 @@ namespace PengarMaskin
                                 if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 25, 00)
                                  & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 00, 00))
                                 {
-                                    var buy = Check.Buyer(_driver, _db, _Aktie, ind, AntalAffarer, AktierListHigh, AktierListBuy, AktierListLow);
+                                    var buy = Check.Buyer(_driver, _db, _Aktie, ind, ref AntalAffarer, AktierListHigh, ref AktierListBuy, AktierListLow);
                                     if (buy)
                                     {
                                         //om köp görs måste vi gå ur
@@ -273,7 +273,7 @@ namespace PengarMaskin
                                 }
 
 
-                                var sell = Check.Seller(_driver, _db, _Aktie, AntalAffarer, AktierListHigh, AktierListBuy, AktierListSell, AktierListLow);
+                                var sell = Check.Seller(_driver, _db, _Aktie, ref AntalAffarer, AktierListHigh, ref AktierListBuy, ref AktierListSell, AktierListLow);
                                 if (sell)
                                 {
                                     //om köp görs måste vi gå ur

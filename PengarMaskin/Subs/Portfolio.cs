@@ -18,9 +18,10 @@ namespace PengarMaskin
             _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/depa/mindepa/depaoversikt.html");
             System.Threading.Thread.Sleep(2 * 1000) ;
             
-            var tillgangligt = _driver.FindElement(By.XPath("//*[@id='tillgangligt']/table/tbody/tr[3]/td[2]"));
+            var Tillgängligt = _driver.FindElement(By.XPath("//*[@id='tillgangligt']/table/tbody/tr[3]/td[2]"));
+            var Depåvärde = _driver.FindElement(By.XPath("//*[@id='portfolioToday']/table/tbody/tr[3]/td[2]/span"));
 
-            Message.Log(MessageType.Info, string.Format("Tillgängligt ={0}", tillgangligt.Text));
+            Message.Log(MessageType.Info, string.Format("Depåvärde = {0} Tillgängligt ={1}",  Depåvärde.Text, Tillgängligt.Text));
 
             //Find the Search text box UI Element
             IWebElement table = _driver.FindElement(By.XPath("//table[@id='aktier']"));
@@ -69,23 +70,25 @@ namespace PengarMaskin
                         AntalAffarer++;
 
                     }
-                    try
-                    {
-                        foreach (var BuyAkt in AktierListBuy)
-                        {
-                            Console.WriteLine(BuyAkt.Namn);
-                        }
-                    }
-
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                        Message.Log(MessageType.Error, ex.Message);
-                    }
                 }
+            }
+            try
+            {
+                foreach (var BuyAkt in AktierListBuy)
+                {
+                    Console.WriteLine(BuyAkt.Namn);
+                    Message.Log(MessageType.Info, BuyAkt.Namn);
+                }
+                Message.Log(MessageType.Info, string.Format("AntalAffarer = {0}", AntalAffarer));
 
             }
 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Message.Log(MessageType.Error, ex.Message);
+            }
+               
         }
     }
 }
