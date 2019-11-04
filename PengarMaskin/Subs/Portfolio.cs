@@ -63,7 +63,7 @@ namespace PengarMaskin
                             Change = Convert.ToDecimal(0),
                             Omsatt = Convert.ToInt64(0),
                             Procent = Convert.ToDecimal(0),
-                            DateTime = DateTime.Now
+                            DateTime = DateTime.Today.AddDays(-1)
                         };
 
                         AktierListBuy.Add(_Aktie);
@@ -79,7 +79,9 @@ namespace PengarMaskin
                     Console.WriteLine(BuyAkt.Namn);
                     Message.Log(MessageType.Info, BuyAkt.Namn);
                 }
-                Message.Log(MessageType.Info, string.Format("AntalAffarer = {0}", AntalAffarer));
+                Message.Log(MessageType.Info, string.Format("AntalAffarer = {0}", AntalAffarer));             
+                
+
 
             }
 

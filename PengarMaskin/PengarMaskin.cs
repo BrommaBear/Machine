@@ -35,6 +35,7 @@ namespace PengarMaskin
         {
 
             Message.Log(MessageType.Info, "Start");
+            Message.Log(MessageType.Info, string.Format("MaxAntalKop = {0}", ConfigurationManager.AppSettings["MaxAntalKop"]));
             Init.Initialize(ref _driver);
 
             try
