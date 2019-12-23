@@ -15,16 +15,28 @@ namespace PengarMaskin
         public static void Kolla_portolio(IWebDriver _driver,ref List<Aktie> AktierListBuy,ref int AntalAffarer)
         {
             Message.Log(MessageType.Info, "Portfolio");
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/depa/mindepa/depaoversikt.html");
-            System.Threading.Thread.Sleep(2 * 1000) ;
+
+            _driver.Navigate().GoToUrl("https://www.nordnet.se/oversikt/konto/2");
+            System.Threading.Thread.Sleep(2 * 1000);
             
-            var Tillgängligt = _driver.FindElement(By.XPath("//*[@id='tillgangligt']/table/tbody/tr[3]/td[2]"));
-            var Depåvärde = _driver.FindElement(By.XPath("//*[@id='portfolioToday']/table/tbody/tr[3]/td[2]/span"));
+
+            var Tillgängligt = _driver.FindElement(By.XPath("//*[@id='main-content']/div/div[2]/div/div/div/div[2]/div/div/div/div/div/span/span"));
+            var Depåvärde = _driver.FindElement(By.XPath("//*[@id='main-content']/div/div[2]/div/div/div/div[1]/div/div/div/div[1]/div/span/span"));
+
+            IWebElement table = _driver.FindElement(By.XPath("//*[@id='main-content']/div/div[2]/div/div/div/div[4]/div/div/div/table"));
+          
+            ReadOnlyCollection<IWebElement> allRows1 = table.FindElements(By.TagName("tr"));
+
+            //_driver.Navigate().GoToUrl("https://classic.nordnet.se/mux/web/depa/mindepa/depaoversikt.html");
+            //System.Threading.Thread.Sleep(2 * 1000) ;
+            
+            //var Tillgängligt = _driver.FindElement(By.XPath("//*[@id='tillgangligt']/table/tbody/tr[3]/td[2]"));
+            //var Depåvärde = _driver.FindElement(By.XPath("//*[@id='portfolioToday']/table/tbody/tr[3]/td[2]/span"));
 
             Message.Log(MessageType.Info, string.Format("Depåvärde = {0} Tillgängligt ={1}",  Depåvärde.Text, Tillgängligt.Text));
 
             //Find the Search text box UI Element
-            IWebElement table = _driver.FindElement(By.XPath("//table[@id='aktier']"));
+            //IWebElement table = _driver.FindElement(By.XPath("//table[@id='aktier']"));
 
             ReadOnlyCollection<IWebElement> allRows = table.FindElements(By.TagName("tr"));
 
@@ -36,9 +48,9 @@ namespace PengarMaskin
                 var rowid = row.GetAttribute("id");
                 ReadOnlyCollection<IWebElement> cells = row.FindElements(By.TagName("td"));
 
-                if (cells.Count > 3)
+                if (cells.Count > 1)
                 {
-                    if (string.IsNullOrWhiteSpace(row.Text) || row.Text.StartsWith("TOTAL"))
+                    if (string.IsNullOrWhiteSpace(row.Text) || row.Text.StartsWith("Totalt"))
                     { }
                     else
                     {
@@ -46,24 +58,24 @@ namespace PengarMaskin
                              new[] { "\r\n", "\r", "\n" },
                              StringSplitOptions.None
                          );
-                        var name = rd[0];
+                        var name = rd[1];
 
-                        string[] split1 = rd[1].Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
-                        string[] split2 = rd[2].Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                        string[] split1 = rd[3].Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                       // string[] split2 = rd[3].Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
 
 
                         var x = new DAL();
-                        DAL.AktieID _AktieID = x.GetAktieID(name);
+                        DAL.Buy aktiebuy = x.GetLastBuy(name);
 
                         var _Aktie = new Aktie
                         {
-                            Aktie_ID = Convert.ToInt32(_AktieID.Aktie_ID),
+                            Aktie_ID = Convert.ToInt32(aktiebuy.Aktie_ID),
                             Namn = name,
-                            Pris = Convert.ToDecimal(split1[2]),
+                            Pris = Convert.ToDecimal(split1[0]),
                             Change = Convert.ToDecimal(0),
                             Omsatt = Convert.ToInt64(0),
                             Procent = Convert.ToDecimal(0),
-                            DateTime = DateTime.Today.AddDays(-1)
+                            DateTime = Convert.ToDateTime(aktiebuy.DateTime)
                         };
 
                         AktierListBuy.Add(_Aktie);

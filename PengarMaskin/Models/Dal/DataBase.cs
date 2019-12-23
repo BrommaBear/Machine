@@ -39,6 +39,7 @@ namespace PengarMaskin
            .Append(",Min07   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-07,@1))", Aktie_ID, dt)
            .Append(",Min05   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-05,@1))", Aktie_ID, dt)
            .Append(",Min03   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-03,@1))", Aktie_ID, dt)
+           .Append(",Min02   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-02,@1))", Aktie_ID, dt)
            .Append(",Min01   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-01,@1))", Aktie_ID, dt)
            .Append(",MinDagFore = (select min(pris) from history where aktie_id = @0 and DateTime > @1 and DateTime < @2)", Aktie_ID, DagFore,DagFore.AddDays(+1))
            
@@ -57,6 +58,18 @@ namespace PengarMaskin
             .Append("Where Namn = @0", Name);
                     
             List <AktieID> ret = _db.Query<AktieID>(sql).ToList();
+            return ret[0];
+        }
+
+        public Buy GetLastBuy(string Name)
+        {
+            var sql = new PetaPoco.Sql()
+            .Append("SELECT top 1 *")
+            .Append("FROM Buy")
+            .Append("Where Namn = @0", Name)
+            .Append("Order by id desc");
+
+            List<Buy> ret = _db.Query<Buy>(sql).ToList();
             return ret[0];
         }
 
@@ -196,6 +209,7 @@ namespace PengarMaskin
             public decimal Min07 { get; set; }
             public decimal Min05 { get; set; }
             public decimal Min03 { get; set; }
+            public decimal Min02 { get; set; }
             public decimal Min01 { get; set; }
             public decimal MinDagFore { get; set; }          
         }

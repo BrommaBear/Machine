@@ -50,8 +50,9 @@ namespace PengarMaskin
             Message.Log(MessageType.Info, "InitChrome");
             ChromeDriverService driverService = ChromeDriverService.CreateDefaultService();
             driverService.HideCommandPromptWindow = true;
-
+            
             ChromeOptions options = new ChromeOptions();
+            options.AddArgument("--start-maximized");
             options.AddArgument("--silent");
             //options.AddArgument("--window-position=-32000,-32000");
             //IWebDriver driver = new ChromeDriver(options);
@@ -63,7 +64,7 @@ namespace PengarMaskin
             _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/login/start.html?cmpi=start-loggain&state=signin");
             System.Threading.Thread.Sleep(1 * 1000);
 
-            var loginSidaButton = _driver.FindElement(By.XPath("//section/section[2]/section/section/section/div[2]/div/button"));
+            var loginSidaButton = _driver.FindElement(By.XPath("//*[@id='authentication-login']/section/section[2]/section/section/section/div[2]/div/button"));
 
             loginSidaButton.Click();
 

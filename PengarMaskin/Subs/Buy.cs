@@ -22,7 +22,7 @@ namespace PengarMaskin
             int kopsumma = int.Parse(ConfigurationManager.AppSettings["KopSumma"]);
             int Volume = Convert.ToInt16(kopsumma / _Aktie.Pris);
 
-            var _url = string.Format("https://www.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
+            var _url = string.Format("https://classic.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
             _driver.Navigate().GoToUrl(_url);
             System.Threading.Thread.Sleep(2 * 1000);
 
@@ -34,7 +34,7 @@ namespace PengarMaskin
                 var priceask = _driver.FindElement(By.Id("price-ask"));
                 var stockPriceField = _driver.FindElement(By.Id("stockPriceField"));
                 stockPriceField.Clear();
-                stockPriceField.SendKeys(priceask.Text);
+                stockPriceField.SendKeys(stockPriceField.Text);
 
             }
             catch (WebDriverException ex)
@@ -43,7 +43,7 @@ namespace PengarMaskin
                 Message.Log(MessageType.Info, ex.Message);
                 System.Threading.Thread.Sleep(2 * 1000);
                 Init.Initialize(ref _driver);
-                _url = string.Format("https://www.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
+                _url = string.Format("https://classic.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
                 _driver.Navigate().GoToUrl(_url);
                 System.Threading.Thread.Sleep(2 * 1000);
                 var stockVolume = _driver.FindElement(By.Id("stockVolumeField"));

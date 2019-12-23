@@ -15,7 +15,7 @@ namespace PengarMaskin
             //var sText = string.Format("Säljer = {0}  Procent = {1}", _Aktie.Namn, _Aktie.Procent);
             //Message.Log(MessageType.Info, sText);
 
-            var _url = string.Format("https://www.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
+            var _url = string.Format("https://classic.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
             _driver.Navigate().GoToUrl(_url);
 
             var stockOwnedVolumeField = _driver.FindElement(By.Id("stockOwnedVolumeField"));
@@ -25,7 +25,7 @@ namespace PengarMaskin
             var stockPriceField = _driver.FindElement(By.Id("stockPriceField"));
             stockPriceField.Clear();
             //stockPriceField.SendKeys(newprice.ToString("{0:0.0}"));
-            stockPriceField.SendKeys(pricebid.Text);
+            stockPriceField.SendKeys(stockPriceField.Text);
 
             // var stockVolume = _driver.FindElement(By.Id("stockVolumeField"));
             //  stockVolume.SendKeys(stockOwnedVolume.Text);
@@ -37,8 +37,9 @@ namespace PengarMaskin
 
             //flippdown.Click();
             //flippup.Click();
-
-            Console.WriteLine(" Sälj Antal = {0}", stockOwnedVolumeField.Text);
+                    
+           
+            Message.Log(MessageType.Info, string.Format("Säljer = {0} Antal = {1} till {2}", _Aktie.Namn, stockOwnedVolumeField.Text, stockPriceField.Text));
             var BuyButton = _driver.FindElement(By.Id("stockSellButton"));
             BuyButton.Click();
 

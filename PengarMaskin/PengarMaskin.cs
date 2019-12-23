@@ -110,15 +110,15 @@ namespace PengarMaskin
                 }
 
             }
-            try
-            {
-                GetPrices();
-            }
-            catch (Exception ex)
-            {
-                Message.Log(MessageType.Info, "Fel i GetPrices");
-                Message.Log(MessageType.Info, ex.Message);
-            }
+            //try
+            //{
+            //    GetPrices();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Message.Log(MessageType.Info, "Fel i GetPrices");
+            //    Message.Log(MessageType.Info, ex.Message);
+            //}
         }
 
 
@@ -126,8 +126,11 @@ namespace PengarMaskin
         public void GetPrices()
         {
             var dt = DateTime.Now;
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=1_1&large=on&mid=on&sektor=0&subtyp=historic_return&sortera=dev_percent&sorteringsordning=fallande");
-            IWebElement table = _driver.FindElement(By.XPath("//table[@id='kurstabell']"));
+            _driver.Navigate().GoToUrl("https://classic.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=1_1&large=on&mid=on&sektor=0&subtyp=historic_return&sortera=dev_percent&sorteringsordning=fallande");
+            IWebElement table = _driver.FindElement(By.XPath("//*[@id='kurstabell']"));
+            //*[@id="tabs-tabpanel-0"]/div[2]/div[2]/div/div[1]/table/caption
+            //*[@id="tabs-tabpanel-0"]/div[2]/div[2]/div/div[1]/table
+
             ReadOnlyCollection<IWebElement> allRows = table.FindElements(By.TagName("tr"));
 
             var ind = 0;
@@ -189,12 +192,17 @@ namespace PengarMaskin
         {
 
 
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/marknadsoversikt/marknadsoversiktSE.html");
+            _driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden");
             //System.Threading.Thread.Sleep(1 * 1000) ;
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/marknadsoversikt/marknadsoversiktSE.html");
-            IWebElement tab = _driver.FindElement(By.ClassName("changeindicator"));
-            IWebElement Btrend = tab.FindElement(By.TagName("p"));
-            decimal Borstrend = Convert.ToDecimal(Btrend.Text.Remove(Btrend.Text.Length - 1, 1));
+            _driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden");
+
+            var Btrend = _driver.FindElement(By.XPath("//*[@id='tabs-tabpanel-0']/div/div/div/ul/li[2]/div[2]/div[1]/div[3]/span/span"));
+                       
+
+            //IWebElement tab = _driver.FindElement(By.ClassName("changeindicator"));
+            //IWebElement Btrend = tab.FindElement(By.TagName("p"));
+            var bt = Btrend.Text.Remove(Btrend.Text.Length - 1, 1).Replace("−","-");
+            decimal Borstrend = Convert.ToDecimal(bt);
 
 
             var db = new Database("Bjorn");
@@ -205,11 +213,17 @@ namespace PengarMaskin
             _borstrend.DateTime = dt;
             db.Insert("BorsTrend", "Id", _borstrend);
 
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&large=on&mid=on&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
-            // _driver.Navigate().GoToUrl("https://www.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=1_1&large=on&mid=on&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
+            //*[@id="main-content"]/div/div[2]/div/div/div/div/div/div/table
+            //https://www.nordnet.se/marknaden/aktiekurser?sortField=diff_pct&sortOrder=desc&exchangeList=se%3Aomxs30
+
+            _driver.Navigate().GoToUrl("https://classic.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
+            // _driver.Navigate().GoToUrl("https://classic.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
+
+
 
             //Find the Search text box UI Element
-            IWebElement table = _driver.FindElement(By.XPath("//table[@id='kurstabell']"));
+            IWebElement table = _driver.FindElement(By.XPath("//*[@id='kurstabell']"));
+           
 
             ReadOnlyCollection<IWebElement> allRows = table.FindElements(By.TagName("tr"));
 
