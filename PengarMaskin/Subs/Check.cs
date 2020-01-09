@@ -236,8 +236,8 @@ namespace PengarMaskin
                     }
 
                     if ((_Aktie.Procent > Convert.ToDecimal(1.0))
-                     & ((_AKtieBuy.DateTime.AddDays(daysadd2) < DateTime.Now)
-                      || (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 15, 00))))
+                     & ((_AKtieBuy.DateTime.AddDays(daysadd2) < DateTime.Now)))
+                    // & (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 15, 00))))
                     {
                         sellType = 5;
                     }

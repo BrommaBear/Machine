@@ -25,7 +25,7 @@ namespace PengarMaskin
             var stockPriceField = _driver.FindElement(By.Id("stockPriceField"));
             stockPriceField.Clear();
             //stockPriceField.SendKeys(newprice.ToString("{0:0.0}"));
-            stockPriceField.SendKeys(stockPriceField.Text);
+            stockPriceField.SendKeys(pricebid.Text);
 
             // var stockVolume = _driver.FindElement(By.Id("stockVolumeField"));
             //  stockVolume.SendKeys(stockOwnedVolume.Text);

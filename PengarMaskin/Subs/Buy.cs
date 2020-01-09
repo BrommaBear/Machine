@@ -34,7 +34,7 @@ namespace PengarMaskin
                 var priceask = _driver.FindElement(By.Id("price-ask"));
                 var stockPriceField = _driver.FindElement(By.Id("stockPriceField"));
                 stockPriceField.Clear();
-                stockPriceField.SendKeys(stockPriceField.Text);
+                stockPriceField.SendKeys(priceask.Text);
 
             }
             catch (WebDriverException ex)

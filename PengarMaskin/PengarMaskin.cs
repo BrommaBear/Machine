@@ -213,8 +213,12 @@ namespace PengarMaskin
             _borstrend.DateTime = dt;
             db.Insert("BorsTrend", "Id", _borstrend);
 
-            //*[@id="main-content"]/div/div[2]/div/div/div/div/div/div/table
-            //https://www.nordnet.se/marknaden/aktiekurser?sortField=diff_pct&sortOrder=desc&exchangeList=se%3Aomxs30
+
+            //_driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden/aktiekurser?sortField=diff_pct&sortOrder=desc&exchangeList=se%3Aomxs30");
+            //_driver.Navigate().GoToUrl("https://www.nordnet.se/bevakningslistor/1002631");
+
+
+
 
             _driver.Navigate().GoToUrl("https://classic.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
             // _driver.Navigate().GoToUrl("https://classic.nordnet.se/mux/web/marknaden/kurslista/aktier.html?marknad=Sverige&lista=26_1&sektor=0&subtyp=price&sortera=dev_percent&sorteringsordning=fallande");
@@ -223,7 +227,14 @@ namespace PengarMaskin
 
             //Find the Search text box UI Element
             IWebElement table = _driver.FindElement(By.XPath("//*[@id='kurstabell']"));
-           
+
+            
+
+            //IWebElement table = _driver.FindElement(By.XPath("//*[@id='tabs-tabpanel-0']/div[2]/div[2]/div/div[1]/table"));
+
+            //IWebElement table = _driver.FindElement(By.XPath("//*[@id='main-content']/div/div[2]/div/div/div/div/div/div/table"));
+
+            
 
             ReadOnlyCollection<IWebElement> allRows = table.FindElements(By.TagName("tr"));
 
@@ -270,7 +281,7 @@ namespace PengarMaskin
 
                             if (_Aktie.Pris > 0)
                             {
-                                _db.Insert("History", "Id", _Aktie);
+                                //_db.Insert("History", "Id", _Aktie);
 
                                 Check.CheckLow(_Aktie, AktierListLow);
 
