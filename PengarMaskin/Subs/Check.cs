@@ -84,7 +84,7 @@ namespace PengarMaskin
                     }
                     if (
                         (_Aktie.Pris < _trend.Min15)
-                       & (_Aktie.Pris <= _trend.Min10)                       
+                       & (_Aktie.Pris <= _trend.Min10)
                        & (_trend.Min05 < _trend.Min10)
                        & (_trend.Min10 < _trend.Min20)
                        & (_trend.Min10 < _trend.Min15)
@@ -126,8 +126,8 @@ namespace PengarMaskin
                         {
                             var sText = string.Format("Skulle köpt Över 1,0 och under 2,0 {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4} AntalAffärer = {5} MaxAntalAffärer = {6}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString(), AntalAffarer, MaxAntalKop);
                             Message.Log(MessageType.Info, sText);
-                            
-                        
+
+
                         }
                     }
                     if ((_Aktie.Pris / _trend.Min02) >= Convert.ToDecimal(1.006)
@@ -171,16 +171,16 @@ namespace PengarMaskin
             }
             return retu;
         }
-        
-         public static Boolean Seller(IWebDriver _driver
-                                     , Database db
-                                     , Aktie _Aktie
-                                     , ref int AntalAffarer
-                                     , List<Aktie> AktierListHigh
-                                     , ref List<Aktie> AktierListBuy
-                                     , ref List<Aktie> AktierListSell
-                                     , List<Aktie> AktierListLow)
-         {
+
+        public static Boolean Seller(IWebDriver _driver
+                                    , Database db
+                                    , Aktie _Aktie
+                                    , ref int AntalAffarer
+                                    , List<Aktie> AktierListHigh
+                                    , ref List<Aktie> AktierListBuy
+                                    , ref List<Aktie> AktierListSell
+                                    , List<Aktie> AktierListLow)
+        {
             var retu = false;
             var _AKtieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
             if (_AKtieBuy != null)
@@ -202,7 +202,7 @@ namespace PengarMaskin
                     overbuy = Convert.ToDecimal(1.015);
                     overbuy2 = Convert.ToDecimal(1.008);
                     underbuy = Convert.ToDecimal(1.04);
-                   
+
                     var sellType = 0;
                     var daysadd1 = 2;
                     var daysadd2 = 4;
@@ -223,8 +223,8 @@ namespace PengarMaskin
                     }
 
                     //if ((DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 20, 00))
-                     if ((_Aktie.Pris / _AKtieBuy.Pris) > Convert.ToDecimal(overbuy2) // & _Aktie.Pris < _trend.Min01)
-                      & (_AKtieBuy.DateTime.AddDays(daysadd1) < DateTime.Now))
+                    if ((_Aktie.Pris / _AKtieBuy.Pris) > Convert.ToDecimal(overbuy2) // & _Aktie.Pris < _trend.Min01)
+                     & (_AKtieBuy.DateTime.AddDays(daysadd1) < DateTime.Now))
                     {
                         sellType = 3;
                     }
@@ -277,8 +277,8 @@ namespace PengarMaskin
             return retu;
         }
 
-        public static void CheckLow( Aktie _Aktie
-                                    ,List<Aktie> AktierListLow)
+        public static void CheckLow(Aktie _Aktie
+                                    , List<Aktie> AktierListLow)
         {
             var _AktieLow = AktierListLow.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
             if (_AktieLow == null)

@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PetaPoco; 
+using PetaPoco;
 
 namespace PengarMaskin
 {
-    class DAL 
+    class DAL
     {
-        readonly Database _db ;
+        readonly Database _db;
         public DAL()
         {
             _db = new Database("Bjorn");
         }
-        public Trend GetTrend(Database db,int Aktie_ID) {
+        public Trend GetTrend(Database db, int Aktie_ID)
+        {
             var dt = DateTime.Now;
             var today = DateTime.Today;
             var DagFore = today.AddDays(-1);
             if (DateTime.Today.DayOfWeek == DayOfWeek.Monday)
             {
-                 DagFore = today.AddDays(-3);
+                DagFore = today.AddDays(-3);
             }
-          
+
             //dt = DateTime.Now.AddHours(-6);
             var sql = new PetaPoco.Sql()
            .Append("Select ")
@@ -41,11 +42,11 @@ namespace PengarMaskin
            .Append(",Min03   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-03,@1))", Aktie_ID, dt)
            .Append(",Min02   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-02,@1))", Aktie_ID, dt)
            .Append(",Min01   = (select top 1 pris from history where aktie_id = @0 and DateTime > dateadd(mi,-01,@1))", Aktie_ID, dt)
-           .Append(",MinDagFore = (select min(pris) from history where aktie_id = @0 and DateTime > @1 and DateTime < @2)", Aktie_ID, DagFore,DagFore.AddDays(+1))
-           
+           .Append(",MinDagFore = (select min(pris) from history where aktie_id = @0 and DateTime > @1 and DateTime < @2)", Aktie_ID, DagFore, DagFore.AddDays(+1))
+
            ;
 
-            List<Trend> ret =  db.Query<Trend>(sql).ToList();
+            List<Trend> ret = db.Query<Trend>(sql).ToList();
             return ret[0];
         }
 
@@ -56,8 +57,8 @@ namespace PengarMaskin
             .Append(",Namn ")
             .Append("FROM Aktie ")
             .Append("Where Namn = @0", Name);
-                    
-            List <AktieID> ret = _db.Query<AktieID>(sql).ToList();
+
+            List<AktieID> ret = _db.Query<AktieID>(sql).ToList();
             return ret[0];
         }
 
@@ -88,7 +89,7 @@ namespace PengarMaskin
             public decimal Pris { get; set; }
             public decimal Change { get; set; }
             public decimal Procent { get; set; }
-            public DateTime DateTime{ get; set; }
+            public DateTime DateTime { get; set; }
         }
 
         [TableName("AktieUtv")]
@@ -106,7 +107,7 @@ namespace PengarMaskin
             public decimal EttAr { get; set; }
             public decimal TvaAr { get; set; }
             public decimal TreAr { get; set; }
-            public decimal FemAr { get; set; }      
+            public decimal FemAr { get; set; }
             public DateTime DateTime { get; set; }
         }
 
@@ -117,7 +118,7 @@ namespace PengarMaskin
             public int Id { get; set; }
             public int Aktie_ID { get; set; }
             public string Namn { get; set; }
-            
+
         }
 
 
@@ -173,6 +174,19 @@ namespace PengarMaskin
             public DateTime DateTime { get; set; }
         }
 
+        [TableName("Portfolio")]
+        [PrimaryKey("Id")]
+        public class Portfolio
+        {
+            public int Id { get; set; }
+            public int Aktie_ID { get; set; }
+            public string Namn { get; set; }
+            public decimal Pris { get; set; }
+            public decimal Change { get; set; }
+            public decimal Procent { get; set; }
+            public DateTime DateTime { get; set; }
+        }
+
         [TableName("Message")]
         [PrimaryKey("Id")]
         public class Message
@@ -211,7 +225,7 @@ namespace PengarMaskin
             public decimal Min03 { get; set; }
             public decimal Min02 { get; set; }
             public decimal Min01 { get; set; }
-            public decimal MinDagFore { get; set; }          
+            public decimal MinDagFore { get; set; }
         }
 
 

@@ -69,7 +69,7 @@ namespace PengarMaskin
                     Environment.Exit(0);
                 }
 
-                ListRefresh();
+                ListRefresh2();
             }
             catch (Exception ex)
             {
@@ -194,25 +194,25 @@ namespace PengarMaskin
 
             _driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden");
             //System.Threading.Thread.Sleep(1 * 1000) ;
-            _driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden");
+            //_driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden");
 
             var Btrend = _driver.FindElement(By.XPath("//*[@id='tabs-tabpanel-0']/div/div/div/ul/li[2]/div[2]/div[1]/div[3]/span/span"));
-                       
+
 
             //IWebElement tab = _driver.FindElement(By.ClassName("changeindicator"));
             //IWebElement Btrend = tab.FindElement(By.TagName("p"));
-            var bt = Btrend.Text.Remove(Btrend.Text.Length - 1, 1).Replace("−","-");
+            var bt = Btrend.Text.Remove(Btrend.Text.Length - 1, 1).Replace("−", "-");
             decimal Borstrend = Convert.ToDecimal(bt);
 
 
             var db = new Database("Bjorn");
 
             var _borstrend = new DAL.BorsTrend();
+
             var dt = DateTime.Now;
             _borstrend.Procent = Borstrend;
             _borstrend.DateTime = dt;
             db.Insert("BorsTrend", "Id", _borstrend);
-
 
             //_driver.Navigate().GoToUrl("https://www.nordnet.se/marknaden/aktiekurser?sortField=diff_pct&sortOrder=desc&exchangeList=se%3Aomxs30");
             //_driver.Navigate().GoToUrl("https://www.nordnet.se/bevakningslistor/1002631");
@@ -228,13 +228,13 @@ namespace PengarMaskin
             //Find the Search text box UI Element
             IWebElement table = _driver.FindElement(By.XPath("//*[@id='kurstabell']"));
 
-            
+
 
             //IWebElement table = _driver.FindElement(By.XPath("//*[@id='tabs-tabpanel-0']/div[2]/div[2]/div/div[1]/table"));
 
             //IWebElement table = _driver.FindElement(By.XPath("//*[@id='main-content']/div/div[2]/div/div/div/div/div/div/table"));
 
-            
+
 
             ReadOnlyCollection<IWebElement> allRows = table.FindElements(By.TagName("tr"));
 
@@ -288,7 +288,7 @@ namespace PengarMaskin
                                 Check.CheckHigh(_Aktie, AktierListHigh);
 
                                 if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 25, 00)
-                                 & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 00, 00))
+                                 & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 01, 00))
                                 {
                                     var buy = Check.Buyer(_driver, _db, _Aktie, ind, ref AntalAffarer, AktierListHigh, ref AktierListBuy, AktierListLow);
                                     if (buy)
@@ -338,6 +338,85 @@ namespace PengarMaskin
                 }
             }
         }
-    }   
+        public void ListRefresh2()
+        {
+            var db = new Database("Bjorn");
+            var dt = DateTime.Now;
+            var dagensid = new Int64();
+            int MaxAntalKop = int.Parse(ConfigurationManager.AppSettings["MaxAntalKop"]);
+
+            if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 31, 00)
+              & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 02, 00))
+            {
+                if (AntalAffarer < MaxAntalKop)
+                {
+                    if (dagensid == 0)
+                    {
+                        dagensid = db.Single<Int64>(string.Format("select isnull(min(id),0) from History with(nolock) where datetime > '{0}'", (DateTime.Today)));
+                    }
+
+                    var result = db.Fetch<Aktie>(";EXEC Stockbuy @0,@1", dagensid, DateTime.Now); //"2020-01-14 09:02:20");
+
+
+                    if (result.Count > 0)
+                    {
+                        var _Aktie = result.First();
+
+                        var _AKtieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
+                        if (_AKtieBuy == null)
+                        {
+
+                            if (AntalAffarer < MaxAntalKop)
+                            {
+
+                                //Köp
+                                Message.Log(MessageType.Info, string.Format("Uppgång {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
+                                Buy.Buyer(_driver, _Aktie);
+                                AktierListBuy.Add(_Aktie);
+                                db.Insert("Buy", "Id", _Aktie);
+                                db.Insert("Portfolio", "Id", _Aktie);
+                                AntalAffarer++;
+                            }
+                            else
+                            {
+                                //logga
+                                Message.Log(MessageType.Info, string.Format("Skulle köpt Uppgång {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
+                            }
+                        }
+                    }
+
+                }
+
+                //Sälj
+                if (AntalAffarer > 0)
+                {
+                    if (dagensid == 0)
+                    {
+                        dagensid = db.Single<Int64>(string.Format("select isnull(min(id),0) from History with(nolock) where datetime > '{0}'", (DateTime.Today)));
+                    }
+
+                    var result = db.Fetch<Aktie>(";EXEC Stocksell @0, @1", dagensid, DateTime.Now); //"2020-01-14 09:02:20");
+
+
+                    if (result.Count > 0)
+                    {
+                        var _Aktie = result.First();
+
+                        //Sälj
+                        Message.Log(MessageType.Info, string.Format("Säljer {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
+                        AktierListSell.Add(_Aktie);
+                        db.Insert("Sell", "Id", _Aktie);
+                        Sell.Seller(_driver, _Aktie);
+                        db.Execute("Delete from portfolio where aktie_id = @0", _Aktie.Aktie_ID);
+                        AntalAffarer--;
+
+                    }
+
+
+                }
+            }
+
+        }
+    }
 }
 

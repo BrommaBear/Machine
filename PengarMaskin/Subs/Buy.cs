@@ -24,14 +24,14 @@ namespace PengarMaskin
 
             var _url = string.Format("https://classic.nordnet.se/mux/web/handla/kopAktier.html?identifier={0}&marketplace=11", _Aktie.Aktie_ID);
             _driver.Navigate().GoToUrl(_url);
-            System.Threading.Thread.Sleep(2 * 1000);
+            //System.Threading.Thread.Sleep(2 * 1000);
 
             try
             {
                 var stockVolume = _driver.FindElement(By.Id("stockVolumeField"));
                 stockVolume.SendKeys(Volume.ToString());
 
-                var priceask = _driver.FindElement(By.Id("price-ask"));
+                var priceask = _driver.FindElement(By.Id("price-bid"));
                 var stockPriceField = _driver.FindElement(By.Id("stockPriceField"));
                 stockPriceField.Clear();
                 stockPriceField.SendKeys(priceask.Text);

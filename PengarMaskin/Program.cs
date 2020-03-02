@@ -15,7 +15,7 @@ namespace PengarMaskin
     {
         static void Main()
         {
-            PengarMaskin pm  = new PengarMaskin();
+            PengarMaskin pm = new PengarMaskin();
             var x = 1;
             while (x == 1)
             {
