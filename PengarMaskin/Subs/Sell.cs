@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PetaPoco;using OpenQA.Selenium;
+using PetaPoco;
+using OpenQA.Selenium;
 using System.Configuration;
 using System.Diagnostics;
 
@@ -127,8 +128,8 @@ namespace PengarMaskin
 
             //flippdown.Click();
             //flippup.Click();
-                    
-           
+
+
             Message.Log(MessageType.Info, string.Format("Säljer = {0} Antal = {1} till {2}", _Aktie.Namn, stockOwnedVolumeField.Text, stockPriceField.Text));
             var BuyButton = _driver.FindElement(By.Id("stockSellButton"));
             BuyButton.Click();

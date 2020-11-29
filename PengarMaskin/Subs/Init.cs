@@ -61,7 +61,7 @@ namespace PengarMaskin
             Message.Log(MessageType.Info, "InitChrome");
             ChromeDriverService driverService = ChromeDriverService.CreateDefaultService();
             driverService.HideCommandPromptWindow = true;
-            
+
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--start-maximized");
             options.AddArgument("--silent");
@@ -99,7 +99,7 @@ namespace PengarMaskin
             var userPasswordField = _driver.FindElement(By.Id("password"));
             userNameField.SendKeys("brommabjorn");
             userPasswordField.SendKeys("Lk(5SMZg");
-            
+
             var loginButton = _driver.FindElement(By.XPath("//*[@id='authentication-login']/section/section[2]/section/section/section/section/section/section/form/section[2]/div[1]/button"));
             //*[@id="authentication-login"]/section/section[2]/section/section/section/section/section/section/form/section[2]/div[1]/button
 
