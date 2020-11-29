@@ -6,18 +6,29 @@ using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Configuration;
-
+using PetaPoco;
 
 namespace PengarMaskin
 {
     class Init
     {
+        public static void Initialize(ref IWebDriver _driver, ref List<AktieURL> AktierURL)
+        {           
+            InitializeFirst(ref _driver);
+            AktierURL = LoadURLs();
+
+        }
         public static void Initialize(ref IWebDriver _driver)
+        {
+            InitializeFirst(ref _driver);
+
+        }
+        public static void InitializeFirst(ref IWebDriver _driver)
         {
             try
             {
                 InitChrome(ref _driver);
-                Logon(_driver);
+                Logon(_driver);                
 
             }
             catch (WebDriverException ex)
@@ -57,6 +68,20 @@ namespace PengarMaskin
             //options.AddArgument("--window-position=-32000,-32000");
             //IWebDriver driver = new ChromeDriver(options);
             _driver = new ChromeDriver(driverService, options);
+
+            var z = _driver.Manage().Window.Size;
+            Message.Log(MessageType.Info, z.ToString());
+
+
+            _driver.Manage().Window.Maximize();
+            var y = _driver.Manage().Window.Size;
+            Message.Log(MessageType.Info, z.ToString());
+
+            System.Drawing.Size windowSize = new System.Drawing.Size(1920, 1080);
+            _driver.Manage().Window.Size = windowSize;
+
+            var x = _driver.Manage().Window.Size;
+            Message.Log(MessageType.Info, z.ToString());
         }
         public static void Logon(IWebDriver _driver)
         {
@@ -82,5 +107,18 @@ namespace PengarMaskin
             System.Threading.Thread.Sleep(2 * 1000);
 
         }
+        private static List<AktieURL> LoadURLs()
+        {           
+
+            Message.Log(MessageType.Info, "Load URLs");
+
+            var dal = new DAL();
+
+            var ret = dal.GetAktieID();
+
+            return ret;
+           
+        }
+
     }
 }

@@ -49,16 +49,18 @@ namespace PengarMaskin
             return ret[0];
         }
 
-        public AktieID GetAktieID(string Name)
+        public List<AktieURL> GetAktieURL()
         {
             var sql = new PetaPoco.Sql()
-            .Append("SELECT Aktie_ID ")
+            .Append("SELECT Id ")
             .Append(",Namn ")
-            .Append("FROM Aktie ")
-            .Append("Where Namn = @0", Name);
+            .Append(",URLBuy ")
+            .Append(",URLSell ")
+            .Append("FROM Aktie ");
+            //.Append("Where Namn = @0", Name);
                     
-            List <AktieID> ret = _db.Query<AktieID>(sql).ToList();
-            return ret[0];
+            List<AktieURL> ret = _db.Query<AktieURL>(sql).ToList();
+            return ret;
         }
 
         public Buy GetLastBuy(string Name)
@@ -67,10 +69,24 @@ namespace PengarMaskin
             .Append("SELECT top 1 *")
             .Append("FROM Buy")
             .Append("Where Namn = @0", Name)
-            .Append("Order by id desc");
+            .Append(" Order by id desc");
 
             List<Buy> ret = _db.Query<Buy>(sql).ToList();
             return ret[0];
+        }
+
+        public List<AktieURL> GetAktieID()
+        {
+            var sql = new PetaPoco.Sql()
+            .Append("SELECT distinct Id ")
+            .Append(",Namn ")
+            .Append(",URLBuy ")
+            .Append(",URLSell ")
+            .Append("FROM Aktie ");
+            //.Append("Where Namn = @0", Name);
+
+            List<AktieURL> ret = _db.Query<AktieURL>(sql).ToList();
+            return ret;
         }
 
 
@@ -115,9 +131,10 @@ namespace PengarMaskin
         public class AktieID
         {
             public int Id { get; set; }
-            public int Aktie_ID { get; set; }
             public string Namn { get; set; }
-            
+            public string URLBuy { get; set; }
+            public string URLSell { get; set; }
+
         }
 
 
@@ -130,6 +147,7 @@ namespace PengarMaskin
             public string Namn { get; set; }
             public decimal Pris { get; set; }
             public decimal Change { get; set; }
+            public Int64 Omsatt { get; set; }
             public decimal Procent { get; set; }
             public DateTime DateTime { get; set; }
         }
@@ -169,7 +187,22 @@ namespace PengarMaskin
             public string Namn { get; set; }
             public decimal Pris { get; set; }
             public decimal Change { get; set; }
+            public Int64 Omsatt { get; set; }
             public decimal Procent { get; set; }
+            public DateTime DateTime { get; set; }
+        }
+
+        [TableName("Portfolio")]
+        [PrimaryKey("Id")]
+        public class Portfolio
+        {
+            public int Id { get; set; }
+            public int Aktie_ID { get; set; }
+            public string Namn { get; set; }
+            public decimal Pris { get; set; }
+            public decimal Change { get; set; }
+            public decimal Procent { get; set; }
+            public Int64 Omsatt { get; set; }
             public DateTime DateTime { get; set; }
         }
 

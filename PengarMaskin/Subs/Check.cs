@@ -17,13 +17,16 @@ namespace PengarMaskin
                                      , ref int AntalAffarer
                                      , List<Aktie> AktierListHigh
                                      , ref List<Aktie> AktierListBuy
-                                     , List<Aktie> AktierListLow)
+                                     , List<Aktie> AktierListLow
+                                     , List<AktieURL> AktierListUrl)
+                                     
         {
             var retu = false;
             decimal faktor;
             var _AktieLow = AktierListLow.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
             var _AKtieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
             var _AktieHigh = AktierListHigh.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
+            var _AktieUrl = AktierListUrl.Find(item => item.Id == _Aktie.Aktie_ID);
             Decimal faktor1 = Convert.ToDecimal(0.985);
 
             if (_AKtieBuy == null)
@@ -56,7 +59,8 @@ namespace PengarMaskin
                         if (AntalAffarer < MaxAntalKop)
                         {
                             Message.Log(MessageType.Info, string.Format("Lägre än igår köper {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString()));
-                            Buy.Buyer(_driver, _Aktie);
+                            
+                            Buy.Buyer(_driver, _Aktie,_AktieUrl);
                             AktierListBuy.Add(_Aktie);
                             db.Insert("Buy", "Id", _Aktie);
                             AntalAffarer++;
@@ -103,7 +107,7 @@ namespace PengarMaskin
                         if (AntalAffarer < MaxAntalKop)
                         {
                             Message.Log(MessageType.Info, string.Format("Över 1,0 och under 2,0 Köper {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString()));
-                            Buy.Buyer(_driver, _Aktie);
+                            Buy.Buyer(_driver, _Aktie,_AktieUrl);
                             AktierListBuy.Add(_Aktie);
                             db.Insert("Buy", "Id", _Aktie);
                             AntalAffarer++;
@@ -139,7 +143,7 @@ namespace PengarMaskin
                         if (AntalAffarer < MaxAntalKop)
                         {
                             Message.Log(MessageType.Info, string.Format("Över 1,0 och under 2,0 Köper {0} Pris = {1} TrendNU = {2} faktor = {3} MinDagFore = {4}", _Aktie.Namn, _Aktie.Pris.ToString(), _trend.TrendNU.ToString(), faktor.ToString(), _trend.MinDagFore.ToString()));
-                            Buy.Buyer(_driver, _Aktie);
+                            Buy.Buyer(_driver, _Aktie,_AktieUrl);
                             AktierListBuy.Add(_Aktie);
                             db.Insert("Buy", "Id", _Aktie);
                             AntalAffarer++;
@@ -258,7 +262,7 @@ namespace PengarMaskin
                         db.Insert("Sell", "Id", _Aktie);
 
                         var _AKtieLow = AktierListLow.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
-                        Sell.Seller(_driver, _Aktie);
+                        Sell.Seller(_driver, _Aktie, true);
                         AntalAffarer--;
 
                         var sText = (string.Format("Säljer = {0} aktie_procent = {13} pris_min = {12} pris_max = {2} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend30 = {14} trend25 = {13} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11}  selltype = {16} overbuy = {17}"

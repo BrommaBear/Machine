@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace PengarMaskin
 {
+    public class AktieURL
+    {
+        public int Id { get; set; }
+        public string Namn { get; set; }
+        public string URLBuy { get; set; }
+        public string URLSell { get; set; }
+
+    }
     public class Aktie : ICloneable
     {
         public Int32 Aktie_ID { get; set; }
