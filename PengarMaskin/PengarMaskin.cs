@@ -24,6 +24,7 @@ namespace PengarMaskin
         public static List<Aktie> AktierListHigh = new List<Aktie>();
         public static List<Aktie> AktierListBuy = new List<Aktie>();
         public static List<Aktie> AktierListSell = new List<Aktie>();
+        public static List<Aktie> AktierListSold = new List<Aktie>();
         public static List<Aktie> AktierListBlanka = new List<Aktie>();
         public static List<Aktie> AktierListBlankaReturn = new List<Aktie>();
         public static List<Aktie> AktierListPlus2 = new List<Aktie>();
@@ -53,17 +54,14 @@ namespace PengarMaskin
                 Message.Log(MessageType.Info, "Error i Kolla_portfolio");
                 Message.Log(MessageType.Info, ex.Message);
             }
-
         }
-
-
 
         public void Run()
         {
 
             try
             {
-                if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 35, 00)
+                if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 30, 00)
                 || (DateTime.Today.DayOfWeek == DayOfWeek.Saturday)
                 || (DateTime.Today.DayOfWeek == DayOfWeek.Sunday))
                 {
@@ -72,8 +70,10 @@ namespace PengarMaskin
                     Message.Log(MessageType.Info, "Exit");
                     Environment.Exit(0);
                 }
-
-                MainLoop();
+                if (DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 07, 00))
+                {
+                    MainLoop();
+                }
             }
             catch (Exception ex)
             {
@@ -89,7 +89,6 @@ namespace PengarMaskin
                 }
                 catch (WebDriverException ex2)
                 {
-
                     Message.Log(MessageType.Info, ex2.Message);
                     Message.Log(MessageType.Info, "Andra försök InitChrome");
                     System.Threading.Thread.Sleep(10 * 1000);
@@ -97,7 +96,6 @@ namespace PengarMaskin
                     try
                     {
                         Init.Initialize(ref _driver);
-
                     }
                     catch (WebDriverException ex3)
                     {
@@ -110,11 +108,8 @@ namespace PengarMaskin
                         Console.WriteLine("Ny init 3");
                         Init.Initialize(ref _driver);
                     }
-
                 }
-
-            }
-           
+            }           
         }
         
         public void MainLoop()
@@ -126,129 +121,124 @@ namespace PengarMaskin
             int MaxAntalKop = int.Parse(ConfigurationManager.AppSettings["MaxAntalKop"]);
             AktierURL = _db.GetAktieURL();
             var antal_i_portfolio = new int();
-
-
-            if (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 31, 00)
-              & DateTime.Now > new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 08, 02, 00))
+ 
+            if (dagensid == 0)
             {
-                
-                if (dagensid == 0)
-                {
-                    dagensid = db.Single<Int64>(string.Format("select isnull(min(id),0) from Prices with(nolock) where datetime > '{0}'", (DateTime.Today)));
-                }
-                              
+                dagensid = db.Single<Int64>(string.Format("select isnull(min(id),0) from Prices with(nolock) where datetime > '{0}'", (DateTime.Today)));
+            }                              
 
-                if (kontrollera_kop & kontrollera_nast_tid < DateTime.Now)
+            if (kontrollera_kop & kontrollera_nast_tid < DateTime.Now)
+            {
+                try
                 {
-                    try
+                    kontrollera_nast_tid = DateTime.Now.AddMinutes(+5);
+
+                    Portfolio.Kolla_portolio(_driver,
+                                                ref AktierListBuy,
+                                                ref AntalAffarer);
+
+                    Message.Log(MessageType.Info, string.Format("1 antal i porttolio = {0} buy list = {1} ", AntalAffarer.ToString(), AktierListBuy.Count));
+
+                    //if (AntalAffarer == 0)
+                    //{
+                    //    AktierListBuy = new List<Aktie>();
+                    //    Message.Log(MessageType.Info, string.Format("1,5 antal i porttolio = {0} buy list = {1} ", antal_i_portfolio.ToString(), AktierListBuy.Count));
+                    //}
+
+                    foreach (var aktie in AktierListBuy)
                     {
-                        Portfolio.Kolla_portolio(_driver,
-                                                 ref AktierListBuy,
-                                                 ref AntalAffarer);
+                        bool finns = db.Fetch<Portfolio>("WHERE Aktie_ID=@0", aktie.Aktie_ID).Any();
+                        if (finns)
+                        {                           
 
-                        foreach (var aktie in AktierListBuy)
-                        {
-                            bool finns = db.Fetch<Portfolio>("WHERE Aktie_ID=@0", aktie.Aktie_ID).Any();
-                            if (finns)
+                            var _AktieSell = AktierListSell.Find(item => item.Aktie_ID == aktie.Aktie_ID);
+                            if (_AktieSell == null)
                             {
                                 //Sälj
+                                var ActieUrl = AktierURL.Find(item => item.Id == aktie.Aktie_ID);
                                 AktierListSell.Add(aktie);
                                 db.Insert("Sell", "Id", aktie);
-                                Sell.Seller(_driver, aktie, false);
-                                db.Execute("Delete from portfolio where aktie_id = @0", aktie.Aktie_ID);
-                                AntalAffarer--;
-
-                                antal_i_portfolio++;
-
+                                Sell.Seller(_driver, aktie, ActieUrl, false);
+                                //db.Execute("Delete from portfolio where aktie_id = @0", aktie.Aktie_ID);
                             }
-                            else
-                            {
-                                kontrollera_nast_tid = DateTime.Now.AddMinutes(+5);
-                            }
-                            
-                        }
-
-                        if (antal_i_portfolio == AktierListBuy.Count)
-                        {
-                            kontrollera_kop = false;
-                        }
-
-                    }
-                    catch (WebDriverException ex)
-                    {
-                        Message.Log(MessageType.Info, "Error i Kolla_portfolio");
-                        Message.Log(MessageType.Info, ex.Message);
-                    }
-
+                            //AntalAffarer--;
+                            //AktierListBuy.Remove(aktie);
+                            antal_i_portfolio++;
+                        }                                             
+                    }                    
                 }
-
-                var result = db.Fetch<Aktie>(";EXEC Stockbuy @0,0,@1", dagensid, DateTime.Now); //"2020-01-14 09:02:20");
-
-                if (result.Count > 0)
+                catch (WebDriverException ex)
                 {
-                    var _Aktie = result.First();
-
-                    var _AktieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
-                    if (_AktieBuy == null)
-                    {
-
-                        if (AntalAffarer < MaxAntalKop)
-                        {
-
-                            //Köp
-                            var ActieUrl = AktierURL.Find(item => item.Id == _Aktie.Aktie_ID);
-                                
-                            //Message.Log(MessageType.Info, string.Format("Uppgång {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
-                            Buy.Buyer(_driver, _Aktie, ActieUrl);
-                            AktierListBuy.Add(_Aktie);
-                            db.Insert("Buy", "Id", _Aktie);
-                            kontrollera_kop = true;
-                            kontrollera_nast_tid = DateTime.Now.AddMinutes(+3);
-                            //db.Insert("Portfolio", "Id", _Aktie);
-                            AntalAffarer++;
-                        }
-                        else
-                        {
-                            //logga
-                            Message.Log(MessageType.Info, string.Format("Skulle köpt Uppgång {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
-                        }
-                    }
-                }
-
-                
-
-                //Sälj
-                if (AntalAffarer > 0)
-                {
-                    if (dagensid == 0)
-                    {
-                        dagensid = db.Single<Int64>(string.Format("select isnull(min(id),0) from Prices with(nolock) where datetime > '{0}'", (DateTime.Today)));
-                    }
-
-                    //var result1 = db.Fetch<Aktie>(";EXEC Stocksell @0, @1", dagensid, DateTime.Now); //"2020-01-14 09:02:20");
-                    //if (result1.Count > 0)
-
-                    foreach (var _Aktie in AktierListBuy)
-                    {
-                        //var _Aktie = result1.First();
-                        if (_Aktie.DateTime.AddMinutes(15) < DateTime.Now)
-                        {
-                            //Sälj
-                            Message.Log(MessageType.Info, string.Format("Säljer {0} 15 min ", _Aktie.Namn));
-                            AktierListSell.Add(_Aktie);
-                            db.Insert("Sell", "Id", _Aktie);
-                            Sell.Seller(_driver, _Aktie, true);
-                            db.Execute("Delete from portfolio where aktie_id = @0", _Aktie.Aktie_ID);
-                            AntalAffarer--;
-                        }   
-                    }
-                   
-
+                    Message.Log(MessageType.Info, "Error i Kolla_portfolio");
+                    Message.Log(MessageType.Info, ex.Message);
+                    kontrollera_nast_tid = DateTime.Now.AddMinutes(+5);
                 }
             }
 
-            i++;
-             
+            var result = db.Fetch<Aktie>(";EXEC Stockbuy @0,0,@1", dagensid, DateTime.Now); //"2020-01-14 09:02:20");
+
+            if (result.Count > 0)
+            {
+                var _Aktie = result.First();
+
+                var _AktieBuy = AktierListBuy.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
+                if (_AktieBuy == null)
+                {
+                    if (AntalAffarer < MaxAntalKop)
+                    {
+                        //Köp
+                        var ActieUrl = AktierURL.Find(item => item.Id == _Aktie.Aktie_ID);
+                                
+                        //Message.Log(MessageType.Info, string.Format("Uppgång {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
+                        Buy.Buyer(_driver, _Aktie, ActieUrl);
+                        AktierListBuy.Add(_Aktie);
+                        db.Insert("Buy", "Id", _Aktie);
+                        kontrollera_kop = true;
+                        kontrollera_nast_tid = DateTime.Now.AddMinutes(+3);
+                        //db.Insert("Portfolio", "Id", _Aktie);
+                        AntalAffarer++;
+                    }
+                    else
+                    {
+                        //logga
+                        Message.Log(MessageType.Info, string.Format("Skulle köpt Uppgång {0} Pris = {1} ", _Aktie.Namn, _Aktie.Pris.ToString()));
+                    }
+                }
+            }                
+
+            //Sälj
+            if (AntalAffarer > 0)
+            {
+                //if (dagensid == 0)
+                //{
+                //    dagensid = db.Single<Int64>(string.Format("select isnull(min(id),0) from Prices with(nolock) where datetime > '{0}'", (DateTime.Today)));
+                //}
+
+                //var result1 = db.Fetch<Aktie>(";EXEC Stocksell @0, @1", dagensid, DateTime.Now); //"2020-01-14 09:02:20");
+                //if (result1.Count > 0)
+
+                foreach (var _Aktie in AktierListBuy)
+                {
+                    //var _Aktie = result1.First();
+                    if ((_Aktie.DateTime.AddMinutes(30) < DateTime.Now)
+                    & db.Fetch<Portfolio>("WHERE Aktie_ID=@0", _Aktie.Aktie_ID).Any()
+                    & (AktierListSold.Exists(item => item.Aktie_ID == _Aktie.Aktie_ID) == false))
+                    {
+                        //Sälj
+                        var ActieUrl = AktierURL.Find(item => item.Id == _Aktie.Aktie_ID);
+
+                        Message.Log(MessageType.Info, string.Format("Säljer {0} eter 2 tim", _Aktie.Namn));
+                        Orders.Kolla_orders(_driver,"Sälj");
+                        Sell.Seller(_driver, _Aktie, ActieUrl, true);
+                        db.Execute("Delete from portfolio where aktie_id = @0", _Aktie.Aktie_ID);
+                        AktierListSold.Add(_Aktie);                        
+                        kontrollera_kop = true;
+                        kontrollera_nast_tid = DateTime.Now.AddMinutes(+5);
+                        Message.Log(MessageType.Info, string.Format("2 antal i porttolio = {0} buy list = {1} ", antal_i_portfolio.ToString(), AktierListBuy.Count));
+                    }   
+                }                
+            }
+            i++;             
         }
     }   
 }

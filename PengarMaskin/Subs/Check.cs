@@ -261,8 +261,10 @@ namespace PengarMaskin
                         AktierListSell.Add(_Aktie);
                         db.Insert("Sell", "Id", _Aktie);
 
+
+                        
                         var _AKtieLow = AktierListLow.Find(item => item.Aktie_ID == _Aktie.Aktie_ID);
-                        Sell.Seller(_driver, _Aktie, true);
+                       // Sell.Seller(_driver, _Aktie, true);
                         AntalAffarer--;
 
                         var sText = (string.Format("Säljer = {0} aktie_procent = {13} pris_min = {12} pris_max = {2} Min20 = {3} Min15 = {4} Min05 = {5} Min01 = {6} pris = {1} trend30 = {14} trend25 = {13} trend20 = {7} trend15 = {8} trend10 = {9} trend05 = {10} trendNU = {11}  selltype = {16} overbuy = {17}"
